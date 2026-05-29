@@ -7,6 +7,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-05-29
+
+### Added
+
+- Dependabot configuration for weekly GitHub Actions and npm dependency updates.
+
+### Changed
+
+- Updated `docker/login-action` from `v4.1.0` to `v4.2.0` in the live test scenario setup workflow.
+- Excluded `.github/workflows/test_live-untag.yml` from the immutable-actions CI check because that workflow runs the
+  locally built action from this repository.
+
 ## [1.0.0] - 2026-05-28
 
 ### Added
