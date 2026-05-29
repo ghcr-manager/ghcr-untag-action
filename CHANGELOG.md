@@ -1,0 +1,30 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to
+[Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+## [1.0.0] - 2026-05-28
+
+### Added
+
+- First stable release of `ghcr-manager/ghcr-untag-action`.
+- Remove one or more tags from a GHCR container package while leaving the underlying manifest in place for any tags that
+  should continue to reference it.
+- Inputs for `token`, `owner`, `package`, and newline-separated `tags`.
+- Support for both user-owned and organization-owned packages.
+- Automatic handling for the temporary manifest copy and cleanup workflow required to emulate tag removal in GHCR.
+- Unit tests covering configuration parsing, HTTP helpers, registry operations, manifest detaching, owner resolution,
+  package version lookup, polling, and the end-to-end untag flow.
+- Live GHCR test workflows covering multiple manifest scenarios, including image manifests, single-platform indexes, and
+  artifact manifests, for both single-tag and multi-tag untag operations.
+- Release automation that validates release tags, rebuilds the bundled action, creates detached immutable release tags,
+  and publishes GitHub releases.
+- Project documentation covering usage, token requirements, implementation notes, and live test package setup.
+
+### Constraints
+
+- Documented and enforced the GHCR limitation that the last remaining tag on a package cannot be removed by this action.
