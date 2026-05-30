@@ -7,6 +7,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [1.0.2] - 2026-05-30
+
+### Changed
+
+- Resolve requested source tags through GHCR manifest lookups instead of scanning GitHub package-version pages to find
+  the original tagged manifest.
+- Keep GitHub package-version paging only for locating and deleting the temporary detached copy created during
+  untagging.
+- Print a normal stack trace on action failures while keeping the failing request URL in leaf HTTP error messages.
+
+### Fixed
+
+- Reject `sha256:...` manifest digest references in the `tags` input early; this action rejects them and only removes
+  regular tags.
+
 ## [1.0.1] - 2026-05-29
 
 ### Added
