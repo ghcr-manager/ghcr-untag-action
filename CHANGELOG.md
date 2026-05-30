@@ -7,6 +7,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [1.0.4] - 2026-05-30
+
+### Changed
+
+- Remove the post-delete package verification scans that walked package-version pages to prove the temporary tag and
+  version were gone after deletion.
+- Drop the custom `log-level` input and use GitHub Actions step debug logging for debug output instead.
+
 ## [1.0.3] - 2026-05-30
 
 ### Added
