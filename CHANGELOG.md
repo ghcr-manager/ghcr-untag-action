@@ -7,6 +7,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [1.0.3] - 2026-05-30
+
+### Added
+
+- Optional `log-level` input with `warn`, `info`, and `debug` values. The default remains `info`.
+
+### Changed
+
+- Expand debug logging across the untag flow to cover owner resolution, page scanning, manifest fetch and publish
+  requests, temporary version lookup polling, and cleanup steps.
+
 ## [1.0.2] - 2026-05-30
 
 ### Changed
