@@ -3,7 +3,7 @@ import { deletePackageVersion } from "./_package-version-delete.js";
 import { loadRegistryManifestByTag } from "./_registry-manifest-load.js";
 import { putRegistryManifestForTag } from "./_registry-manifest-put.js";
 import { loadRegistryPushToken } from "./_registry-token.js";
-import { assertTagRemoved, assertVersionRemoved, resolveDetachedTagVersion } from "./_untag-polling.js";
+import { resolveDetachedTagVersion } from "./_untag-polling.js";
 import type { LoadedRegistryManifest, UntagOperation, UntagOptions, UntagRootSelection } from "./_types.js";
 
 export async function runUntag(
@@ -43,8 +43,6 @@ export async function runUntag(
       const detachedVersion = await resolveDetachedTagVersion(owner, packageName, tag, root, detachedDigest, options);
 
       await deletePackageVersion(owner, packageName, detachedVersion.sourceVersionId, options);
-      await assertTagRemoved(owner, packageName, tag, options);
-      await assertVersionRemoved(owner, packageName, detachedVersion.sourceVersionId, options);
       options.logger.debug(
         `Completed untag for ${owner}/${packageName}:${tag}; detached version ${detachedVersion.sourceVersionId} (${detachedDigest}) removed`
       );

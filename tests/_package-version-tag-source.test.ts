@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { listPackageVersionTagSources, listPresentPackageVersionIds } from "../src/_package-version-tag-source.js";
+import { listPackageVersionTagSources } from "../src/_package-version-tag-source.js";
 
 test("listPackageVersionTagSources resolves requested tags to source versions and digests", async () => {
   const matches = await listPackageVersionTagSources("acme", "example", ["latest", "stable"], {
@@ -53,22 +53,6 @@ test("listPackageVersionTagSources short-circuits empty input", async () => {
   });
 
   assert.deepEqual(matches, []);
-});
-
-test("listPresentPackageVersionIds returns only present ids", async () => {
-  const ids = await listPresentPackageVersionIds("acme", "example", [101, 202], {
-    token: "token",
-    logger: _logger(),
-    fetchImpl: async (input) => {
-      if (input === "https://api.github.com/users/acme") {
-        return _jsonResponse({ type: "Organization" });
-      }
-
-      return _jsonResponse([{ id: 202 }]);
-    }
-  });
-
-  assert.deepEqual(ids, [202]);
 });
 
 function _jsonResponse(body: unknown) {

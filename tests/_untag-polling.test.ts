@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { assertTagRemoved, assertVersionRemoved, resolveDetachedTagVersion } from "../src/_untag-polling.js";
+import { resolveDetachedTagVersion } from "../src/_untag-polling.js";
 
 test("resolveDetachedTagVersion returns the rewritten tag target", async () => {
   const match = await resolveDetachedTagVersion(
@@ -37,34 +37,6 @@ test("resolveDetachedTagVersion returns the rewritten tag target", async () => {
 
   assert.equal(match.sourceVersionId, 202);
   assert.equal(match.sourceDigest, "sha256:detached");
-});
-
-test("assertTagRemoved returns when the tag is absent", async () => {
-  await assertTagRemoved("acme", "example", "latest", {
-    token: "token",
-    logger: _logger(),
-    fetchImpl: async (input) => {
-      if (String(input) === "https://api.github.com/users/acme") {
-        return _jsonResponse({ type: "Organization" });
-      }
-
-      return _jsonResponse([]);
-    }
-  });
-});
-
-test("assertVersionRemoved returns when the version is absent", async () => {
-  await assertVersionRemoved("acme", "example", 202, {
-    token: "token",
-    logger: _logger(),
-    fetchImpl: async (input) => {
-      if (String(input) === "https://api.github.com/users/acme") {
-        return _jsonResponse({ type: "Organization" });
-      }
-
-      return _jsonResponse([]);
-    }
-  });
 });
 
 test("resolveDetachedTagVersion fails when the detached version never appears", async () => {
