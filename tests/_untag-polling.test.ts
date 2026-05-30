@@ -8,7 +8,6 @@ test("resolveDetachedTagVersion returns the rewritten tag target", async () => {
     "example",
     "latest",
     {
-      versionId: 101,
       digest: "sha256:source",
       tags: ["latest"]
     },
@@ -76,7 +75,6 @@ test("resolveDetachedTagVersion fails when the detached version never appears", 
         "example",
         "latest",
         {
-          versionId: 101,
           digest: "sha256:source",
           tags: ["latest"]
         },

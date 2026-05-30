@@ -18,10 +18,11 @@ export async function loadPackageVersionPage(
   );
   url.searchParams.set("per_page", "100");
   url.searchParams.set("page", String(page));
+  const requestLabel = `GitHub Packages request for page ${page} (${url.toString()})`;
 
   let response;
   try {
-    response = await runWithRetry(`GitHub Packages request for page ${page}`, logger, async () => {
+    response = await runWithRetry(requestLabel, logger, async () => {
       const pageResponse = await fetchImpl(url.toString(), {
         headers: {
           Accept: "application/vnd.github+json",
@@ -31,18 +32,18 @@ export async function loadPackageVersionPage(
         }
       });
       if (!pageResponse.ok && isRetryableStatus(pageResponse.status)) {
-        throw new Error(await buildHttpErrorMessage(pageResponse, `GitHub Packages request for page ${page} failed`));
+        throw new Error(await buildHttpErrorMessage(pageResponse, `${requestLabel} failed`));
       }
       return pageResponse;
     });
   } catch (error) {
-    throw new Error(buildTransportErrorMessage(error, `GitHub Packages request for page ${page} failed`), {
+    throw new Error(buildTransportErrorMessage(error, `${requestLabel} failed`), {
       cause: error
     });
   }
 
   if (!response.ok) {
-    throw new Error(await buildHttpErrorMessage(response, `GitHub Packages request for page ${page} failed`));
+    throw new Error(await buildHttpErrorMessage(response, `${requestLabel} failed`));
   }
 
   return (await response.json()) as PackageVersionPageItem[];

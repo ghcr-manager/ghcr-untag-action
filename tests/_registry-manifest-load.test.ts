@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { loadRegistryManifestByDigest } from "../src/_registry-manifest-load.js";
+import { loadRegistryManifestByDigest, loadRegistryManifestByTag } from "../src/_registry-manifest-load.js";
 
 test("loadRegistryManifestByDigest loads a manifest document", async () => {
   const manifest = await loadRegistryManifestByDigest("acme", "example", "sha256:source", "registry-token", _logger(), {
@@ -10,7 +10,8 @@ test("loadRegistryManifestByDigest loads a manifest document", async () => {
         ok: true,
         status: 200,
         headers: new Headers({
-          "content-type": "application/vnd.oci.image.manifest.v1+json"
+          "content-type": "application/vnd.oci.image.manifest.v1+json",
+          "docker-content-digest": "sha256:source"
         }),
         async json() {
           return {
@@ -28,6 +29,31 @@ test("loadRegistryManifestByDigest loads a manifest document", async () => {
   });
 
   assert.equal(manifest.digest, "sha256:source");
+  assert.equal(manifest.mediaType, "application/vnd.oci.image.manifest.v1+json");
+});
+
+test("loadRegistryManifestByTag resolves a tag to its manifest digest", async () => {
+  const manifest = await loadRegistryManifestByTag("acme", "example", "latest", "registry-token", _logger(), {
+    fetchImpl: async (input) => {
+      assert.equal(String(input), "https://ghcr.io/v2/acme/example/manifests/latest");
+      return {
+        ok: true,
+        status: 200,
+        headers: new Headers({
+          "content-type": "application/vnd.oci.image.manifest.v1+json",
+          "docker-content-digest": "sha256:resolved"
+        }),
+        async json() {
+          return {
+            mediaType: "application/vnd.oci.image.manifest.v1+json",
+            layers: []
+          };
+        }
+      };
+    }
+  });
+
+  assert.equal(manifest.digest, "sha256:resolved");
   assert.equal(manifest.mediaType, "application/vnd.oci.image.manifest.v1+json");
 });
 
@@ -62,6 +88,23 @@ test("loadRegistryManifestByDigest requires a media type", async () => {
         })
       }),
     /did not include a media type/
+  );
+});
+
+test("loadRegistryManifestByTag requires a digest for tag lookups", async () => {
+  await assert.rejects(
+    () =>
+      loadRegistryManifestByTag("acme", "example", "latest", "registry-token", _logger(), {
+        fetchImpl: async () => ({
+          ok: true,
+          status: 200,
+          headers: new Headers({ "content-type": "application/vnd.oci.image.manifest.v1+json" }),
+          async json() {
+            return { mediaType: "application/vnd.oci.image.manifest.v1+json" };
+          }
+        })
+      }),
+    /did not include a docker-content-digest header/
   );
 });
 

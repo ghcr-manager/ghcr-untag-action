@@ -12,12 +12,7 @@ export async function resolveDetachedTagVersion(
   for (let attempt = 1; attempt <= 5; attempt += 1) {
     const matches = await listPackageVersionTagSources(owner, packageName, [tag], options);
     const match = matches[0];
-    if (
-      match &&
-      match.sourceVersionId !== sourceRoot.versionId &&
-      match.sourceDigest !== sourceRoot.digest &&
-      match.sourceDigest === detachedDigest
-    ) {
+    if (match && match.sourceDigest !== sourceRoot.digest && match.sourceDigest === detachedDigest) {
       return match;
     }
 

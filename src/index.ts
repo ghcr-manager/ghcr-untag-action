@@ -15,5 +15,11 @@ async function main(): Promise<void> {
 }
 
 void main().catch((error) => {
-  core.setFailed(error instanceof Error ? error.message : String(error));
+  if (error instanceof Error) {
+    core.error(error.stack ?? error.message);
+    core.setFailed(error.message);
+    return;
+  }
+
+  core.setFailed(String(error));
 });

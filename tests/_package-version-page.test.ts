@@ -30,13 +30,15 @@ test("loadPackageVersionPage surfaces non-ok responses", async () => {
         return {
           ok: false,
           status: 403,
-          headers: new Headers({ "content-type": "application/json" }),
+          headers: new Headers({
+            "content-type": "application/json"
+          }),
           async json() {
             return { message: "forbidden" };
           }
         };
       }),
-    /GitHub Packages request for page 1 failed - status 403 - forbidden/
+    /GitHub Packages request for page 1 \(https:\/\/api\.github\.com\/orgs\/acme\/packages\/container\/example\/versions\?per_page=100&page=1\) failed - status 403 - forbidden/
   );
 });
 

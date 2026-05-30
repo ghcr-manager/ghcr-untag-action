@@ -37,14 +37,12 @@ export interface TagSource {
 
 export interface UntagOperation {
   tag: string;
-  sourceVersionId: number;
   sourceDigest: string;
   detachedVersionId: number;
   detachedDigest: string;
 }
 
 export interface UntagRootSelection {
-  versionId: number;
   digest: string;
   tags: string[];
 }

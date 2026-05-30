@@ -19,6 +19,12 @@ export function readInputs(): ActionInputs {
   if (tags.length === 0) {
     throw new Error("input 'tags' must include at least one non-empty line");
   }
+  const shaLikeTags = tags.filter((tag) => _isShaLikeTag(tag));
+  if (shaLikeTags.length > 0) {
+    throw new Error(
+      `input 'tags' contains sha256 manifest digest references; this action rejects them and only removes regular tags: ${shaLikeTags.join(", ")}`
+    );
+  }
 
   return {
     token,
@@ -26,4 +32,8 @@ export function readInputs(): ActionInputs {
     packageName,
     tags
   };
+}
+
+function _isShaLikeTag(tag: string): boolean {
+  return /^sha256:[0-9a-f]{64}$/i.test(tag);
 }

@@ -1,11 +1,10 @@
 import { buildDetachedManifestClone } from "./_manifest-detach.js";
 import { deletePackageVersion } from "./_package-version-delete.js";
-import { listPackageVersionTagSources } from "./_package-version-tag-source.js";
-import { loadRegistryManifestByDigest } from "./_registry-manifest-load.js";
+import { loadRegistryManifestByTag } from "./_registry-manifest-load.js";
 import { putRegistryManifestForTag } from "./_registry-manifest-put.js";
 import { loadRegistryPushToken } from "./_registry-token.js";
 import { assertTagRemoved, assertVersionRemoved, resolveDetachedTagVersion } from "./_untag-polling.js";
-import type { TagSource, UntagOperation, UntagOptions, UntagRootSelection } from "./_types.js";
+import type { LoadedRegistryManifest, UntagOperation, UntagOptions, UntagRootSelection } from "./_types.js";
 
 export async function runUntag(
   owner: string,
@@ -18,31 +17,15 @@ export async function runUntag(
     throw new Error("at least one tag is required");
   }
 
-  const tagSources = await listPackageVersionTagSources(owner, packageName, uniqueRequestedTags, options);
-  const matchedTags = new Set(tagSources.map((tagSource) => tagSource.tag));
-  const missingTags = uniqueRequestedTags.filter((tag) => !matchedTags.has(tag));
-  if (missingTags.length > 0) {
-    throw new Error(`could not resolve tag(s): ${missingTags.join(", ")}`);
-  }
-
-  const roots = groupTagSources(tagSources);
   const registryToken = await loadRegistryPushToken(owner, packageName, options);
+  const roots = await resolveSourceTagRoots(owner, packageName, uniqueRequestedTags, registryToken, options);
   const operations: UntagOperation[] = [];
   const runtime = options.fetchImpl ? { fetchImpl: options.fetchImpl } : undefined;
 
   for (const root of roots) {
-    const sourceManifest = await loadRegistryManifestByDigest(
-      owner,
-      packageName,
-      root.digest,
-      registryToken,
-      options.logger,
-      runtime
-    );
-
     for (const tag of root.tags) {
       options.logger.info(`Detaching tag ${owner}/${packageName}:${tag} from ${root.digest}`);
-      const detachedManifestJson = buildDetachedManifestClone(sourceManifest.rawJson, sourceManifest.mediaType, {
+      const detachedManifestJson = buildDetachedManifestClone(root.manifest.rawJson, root.manifest.mediaType, {
         detachedTag: tag,
         sourceDigest: root.digest
       });
@@ -50,7 +33,7 @@ export async function runUntag(
         owner,
         packageName,
         tag,
-        sourceManifest.mediaType,
+        root.manifest.mediaType,
         detachedManifestJson,
         registryToken,
         options.logger,
@@ -64,7 +47,6 @@ export async function runUntag(
 
       operations.push({
         tag,
-        sourceVersionId: root.versionId,
         sourceDigest: root.digest,
         detachedVersionId: detachedVersion.sourceVersionId,
         detachedDigest
@@ -75,22 +57,53 @@ export async function runUntag(
   return operations;
 }
 
-export function groupTagSources(tagSources: TagSource[]): UntagRootSelection[] {
-  const groups = new Map<string, UntagRootSelection>();
-  for (const tagSource of tagSources) {
-    const key = `${tagSource.sourceVersionId}:${tagSource.sourceDigest}`;
-    const existing = groups.get(key);
+export async function resolveSourceTagRoots(
+  owner: string,
+  packageName: string,
+  tags: string[],
+  registryToken: string,
+  options: UntagOptions
+): Promise<Array<UntagRootSelection & { manifest: LoadedRegistryManifest }>> {
+  const runtime = options.fetchImpl ? { fetchImpl: options.fetchImpl } : undefined;
+  const groups = new Map<string, UntagRootSelection & { manifest: LoadedRegistryManifest }>();
+  const missingTags: string[] = [];
+
+  for (const tag of tags) {
+    let manifest: LoadedRegistryManifest;
+    try {
+      manifest = await loadRegistryManifestByTag(owner, packageName, tag, registryToken, options.logger, runtime);
+    } catch (error) {
+      if (_isMissingTagError(error)) {
+        missingTags.push(tag);
+        continue;
+      }
+      throw error;
+    }
+
+    const existing = groups.get(manifest.digest);
     if (existing) {
-      existing.tags.push(tagSource.tag);
+      existing.tags.push(tag);
       continue;
     }
 
-    groups.set(key, {
-      versionId: tagSource.sourceVersionId,
-      digest: tagSource.sourceDigest,
-      tags: [tagSource.tag]
+    groups.set(manifest.digest, {
+      digest: manifest.digest,
+      tags: [tag],
+      manifest
     });
   }
 
+  if (missingTags.length > 0) {
+    throw new Error(`could not resolve tag(s): ${missingTags.join(", ")}`);
+  }
+
   return [...groups.values()];
+}
+
+function _isMissingTagError(error: unknown): boolean {
+  if (!(error instanceof Error)) {
+    return false;
+  }
+
+  return /status 404/.test(error.message);
 }

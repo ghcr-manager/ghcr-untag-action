@@ -24,7 +24,6 @@ test("type-only module remains aligned with the untag domain shapes", () => {
     sourceDigest: "sha256:source"
   };
   const root: UntagRootSelection = {
-    versionId: 1,
     digest: "sha256:source",
     tags: ["latest"]
   };
@@ -35,7 +34,6 @@ test("type-only module remains aligned with the untag domain shapes", () => {
   };
   const operation: UntagOperation = {
     tag: "latest",
-    sourceVersionId: 1,
     sourceDigest: "sha256:source",
     detachedVersionId: 2,
     detachedDigest: "sha256:detached"

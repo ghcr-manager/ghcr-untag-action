@@ -25,3 +25,15 @@ test("readInputs rejects empty tags", async () => {
 
   assert.throws(() => readInputs(), /input 'tags' must include at least one non-empty line/);
 });
+
+test("readInputs rejects sha-like tags", async () => {
+  process.env.INPUT_TOKEN = "token";
+  process.env.INPUT_OWNER = "acme";
+  process.env.INPUT_PACKAGE = "example";
+  process.env.INPUT_TAGS = "latest\nsha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\n";
+
+  assert.throws(
+    () => readInputs(),
+    /input 'tags' contains sha256 manifest digest references; this action rejects them and only removes regular tags/
+  );
+});

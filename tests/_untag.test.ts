@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import test from "node:test";
-import { runUntag } from "../src/_untag.js";
+import { resolveSourceTagRoots, runUntag } from "../src/_untag.js";
 
 test("runUntag retargets tags and deletes the temporary package versions", async () => {
   const requests: Array<{
@@ -28,20 +28,6 @@ test("runUntag retargets tags and deletes the temporary package versions", async
 
       if (url === "https://api.github.com/orgs/acme/packages/container/example/versions?per_page=100&page=1") {
         if (requests.filter((request) => request.url === url).length === 1) {
-          return _jsonResponse([
-            {
-              id: 101,
-              name: "sha256:source",
-              metadata: {
-                container: {
-                  tags: ["latest"]
-                }
-              }
-            }
-          ]);
-        }
-
-        if (requests.filter((request) => request.url === url).length === 2) {
           assert.ok(detachedDigest);
           return _jsonResponse([
             {
@@ -63,18 +49,6 @@ test("runUntag retargets tags and deletes the temporary package versions", async
         return _jsonResponse({ token: "registry-token" });
       }
 
-      if (url === "https://ghcr.io/v2/acme/example/manifests/sha256:source") {
-        return _jsonResponse({
-          mediaType: "application/vnd.oci.image.manifest.v1+json",
-          config: {
-            mediaType: "application/vnd.oci.image.config.v1+json",
-            digest: "sha256:config",
-            size: 10
-          },
-          layers: []
-        });
-      }
-
       if (url === "https://ghcr.io/v2/acme/example/manifests/latest" && init?.method === "PUT") {
         const body = typeof init.body === "string" ? init.body : "";
         detachedDigest = `sha256:${createHash("sha256").update(body).digest("hex")}`;
@@ -86,6 +60,23 @@ test("runUntag retargets tags and deletes the temporary package versions", async
             return {};
           }
         };
+      }
+
+      if (url === "https://ghcr.io/v2/acme/example/manifests/latest") {
+        return _jsonResponse(
+          {
+            mediaType: "application/vnd.oci.image.manifest.v1+json",
+            config: {
+              mediaType: "application/vnd.oci.image.config.v1+json",
+              digest: "sha256:config",
+              size: 10
+            },
+            layers: []
+          },
+          {
+            "docker-content-digest": "sha256:source"
+          }
+        );
       }
 
       if (
@@ -108,9 +99,10 @@ test("runUntag retargets tags and deletes the temporary package versions", async
 
   assert.equal(operations.length, 1);
   assert.equal(operations[0]?.tag, "latest");
-  assert.equal(operations[0]?.sourceVersionId, 101);
   assert.match(
-    requests.find((request) => request.url === "https://ghcr.io/v2/acme/example/manifests/latest")?.body ?? "",
+    requests.find(
+      (request) => request.url === "https://ghcr.io/v2/acme/example/manifests/latest" && request.method === "PUT"
+    )?.body ?? "",
     /detached-tag/
   );
 });
@@ -122,12 +114,19 @@ test("runUntag fails when a requested tag cannot be resolved", async () => {
         token: "token",
         logger: _logger(),
         fetchImpl: async (input) => {
-          if (input === "https://api.github.com/users/acme") {
-            return _jsonResponse({ type: "Organization" });
+          if (input === "https://ghcr.io/token?service=ghcr.io&scope=repository%3Aacme%2Fexample%3Apull%2Cpush") {
+            return _jsonResponse({ token: "registry-token" });
           }
 
-          if (input === "https://api.github.com/orgs/acme/packages/container/example/versions?per_page=100&page=1") {
-            return _jsonResponse([]);
+          if (input === "https://ghcr.io/v2/acme/example/manifests/missing") {
+            return {
+              ok: false,
+              status: 404,
+              headers: new Headers({ "content-type": "application/json" }),
+              async json() {
+                return { message: "manifest unknown" };
+              }
+            };
           }
 
           throw new Error(`unexpected request: ${input}`);
@@ -137,11 +136,42 @@ test("runUntag fails when a requested tag cannot be resolved", async () => {
   );
 });
 
-function _jsonResponse(body: unknown) {
+test("resolveSourceTagRoots groups tags by resolved manifest digest", async () => {
+  const roots = await resolveSourceTagRoots("acme", "example", ["latest", "stable"], "registry-token", {
+    token: "token",
+    logger: _logger(),
+    fetchImpl: async (input) => {
+      const url = String(input);
+      if (
+        url === "https://ghcr.io/v2/acme/example/manifests/latest" ||
+        url === "https://ghcr.io/v2/acme/example/manifests/stable"
+      ) {
+        return _jsonResponse(
+          {
+            mediaType: "application/vnd.oci.image.manifest.v1+json",
+            layers: []
+          },
+          {
+            "docker-content-digest": "sha256:source"
+          }
+        );
+      }
+
+      throw new Error(`unexpected request: ${input}`);
+    }
+  });
+
+  assert.deepEqual(
+    roots.map((root) => ({ digest: root.digest, tags: root.tags })),
+    [{ digest: "sha256:source", tags: ["latest", "stable"] }]
+  );
+});
+
+function _jsonResponse(body: unknown, headers?: Record<string, string>) {
   return {
     ok: true,
     status: 200,
-    headers: new Headers({ "content-type": "application/json" }),
+    headers: new Headers({ "content-type": "application/json", ...headers }),
     async json() {
       return body;
     }
