@@ -5,14 +5,12 @@ export interface ActionInputs {
   owner: string;
   packageName: string;
   tags: string[];
-  logLevel: "warn" | "info" | "debug";
 }
 
 export function readInputs(): ActionInputs {
   const token = core.getInput("token", { required: true });
   const owner = core.getInput("owner", { required: true });
   const packageName = core.getInput("package", { required: true });
-  const logLevel = _readLogLevel();
   const tags = core
     .getMultilineInput("tags", { required: true, trimWhitespace: true })
     .map((tag) => tag.trim())
@@ -32,20 +30,10 @@ export function readInputs(): ActionInputs {
     token,
     owner,
     packageName,
-    tags,
-    logLevel
+    tags
   };
 }
 
 function _isShaLikeTag(tag: string): boolean {
   return /^sha256:[0-9a-f]{64}$/i.test(tag);
-}
-
-function _readLogLevel(): "warn" | "info" | "debug" {
-  const value = core.getInput("log-level", { trimWhitespace: true }) || "info";
-  if (value === "warn" || value === "info" || value === "debug") {
-    return value;
-  }
-
-  throw new Error(`input 'log-level' must be one of: warn, info, debug`);
 }

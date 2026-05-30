@@ -13,8 +13,7 @@ test("readInputs reads required action inputs", async () => {
     token: "token",
     owner: "acme",
     packageName: "example",
-    tags: ["first", "second"],
-    logLevel: "info"
+    tags: ["first", "second"]
   });
 });
 
@@ -37,25 +36,4 @@ test("readInputs rejects sha-like tags", async () => {
     () => readInputs(),
     /input 'tags' contains sha256 manifest digest references; this action rejects them and only removes regular tags/
   );
-});
-
-test("readInputs accepts an explicit log level", async () => {
-  process.env.INPUT_TOKEN = "token";
-  process.env.INPUT_OWNER = "acme";
-  process.env.INPUT_PACKAGE = "example";
-  process.env.INPUT_TAGS = "first\n";
-  process.env["INPUT_LOG-LEVEL"] = "debug";
-
-  const inputs = readInputs();
-  assert.equal(inputs.logLevel, "debug");
-});
-
-test("readInputs rejects unknown log levels", async () => {
-  process.env.INPUT_TOKEN = "token";
-  process.env.INPUT_OWNER = "acme";
-  process.env.INPUT_PACKAGE = "example";
-  process.env.INPUT_TAGS = "first\n";
-  process.env["INPUT_LOG-LEVEL"] = "verbose";
-
-  assert.throws(() => readInputs(), /input 'log-level' must be one of: warn, info, debug/);
 });

@@ -12,13 +12,12 @@ for you.
 
 ## Inputs
 
-| Input       | Required | Description                                                    |
-| ----------- | -------- | -------------------------------------------------------------- |
-| `token`     | yes      | GitHub token with package read, write, and delete permissions. |
-| `owner`     | yes      | Package owner name, either an org or a user.                   |
-| `package`   | yes      | Container package name.                                        |
-| `tags`      | yes      | Newline-separated tags to remove.                              |
-| `log-level` | no       | Log verbosity: `warn`, `info`, or `debug`. Defaults to `info`. |
+| Input     | Required | Description                                                    |
+| --------- | -------- | -------------------------------------------------------------- |
+| `token`   | yes      | GitHub token with package read, write, and delete permissions. |
+| `owner`   | yes      | Package owner name, either an org or a user.                   |
+| `package` | yes      | Container package name.                                        |
+| `tags`    | yes      | Newline-separated tags to remove.                              |
 
 ## Example
 

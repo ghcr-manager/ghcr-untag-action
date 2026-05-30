@@ -18,9 +18,6 @@ inputs:
   tags:
     description: Newline-separated tags to remove.
     required: true
-  log-level:
-    description: Log verbosity. One of `warn`, `info`, or `debug`.
-    required: false
 runs:
   using: node24
   main: dist/index.js
