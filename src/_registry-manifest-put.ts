@@ -21,6 +21,7 @@ export async function putRegistryManifestForTag(
 ): Promise<string> {
   const fetchImpl = resolveFetch(options?.fetchImpl);
   const url = new URL(`/v2/${owner}/${packageName}/manifests/${encodeURIComponent(tag)}`, ghcrRegistryBaseUrl);
+  logger.debug(`Publishing detached GHCR manifest for ${owner}/${packageName}:${tag} with media type ${mediaType}`);
 
   let response;
   try {
@@ -49,5 +50,7 @@ export async function putRegistryManifestForTag(
     throw new Error(await buildHttpErrorMessage(response, `GHCR manifest put request for tag ${tag} failed`));
   }
 
-  return `sha256:${createHash("sha256").update(manifestJson).digest("hex")}`;
+  const digest = `sha256:${createHash("sha256").update(manifestJson).digest("hex")}`;
+  logger.debug(`Published detached GHCR manifest for ${owner}/${packageName}:${tag} as ${digest}`);
+  return digest;
 }

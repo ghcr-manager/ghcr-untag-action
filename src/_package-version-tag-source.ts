@@ -16,10 +16,12 @@ export async function listPackageVersionTagSources(
 
   const requestedTagSet = new Set(requestedTags);
   const matches = new Map<string, TagSource>();
+  options.logger.debug(`Scanning package versions for ${owner}/${packageName} tag(s): ${requestedTags.join(", ")}`);
 
   for (let page = 1; ; page += 1) {
     const items = await loadPackageVersionPage(owner, packageName, page, options.token, options.logger, fetchImpl);
     if (items.length === 0) {
+      options.logger.debug(`Package-version tag scan reached empty page ${page} for ${owner}/${packageName}`);
       break;
     }
 
@@ -39,10 +41,16 @@ export async function listPackageVersionTagSources(
           sourceVersionId: item.id,
           sourceDigest: item.name
         });
+        options.logger.debug(
+          `Matched tag ${owner}/${packageName}:${tag} on page ${page} at version ${item.id} (${item.name})`
+        );
       }
     }
 
     if (matches.size === requestedTags.length || items.length < 100) {
+      options.logger.debug(
+        `Stopping package-version tag scan for ${owner}/${packageName} at page ${page}; matches=${matches.size}/${requestedTags.length}, items=${items.length}`
+      );
       break;
     }
   }
@@ -67,20 +75,28 @@ export async function listPresentPackageVersionIds(
 
   const requestedVersionIdSet = new Set(requestedVersionIds);
   const matches = new Set<number>();
+  options.logger.debug(
+    `Scanning package versions for ${owner}/${packageName} version id(s): ${requestedVersionIds.join(", ")}`
+  );
 
   for (let page = 1; ; page += 1) {
     const items = await loadPackageVersionPage(owner, packageName, page, options.token, options.logger, fetchImpl);
     if (items.length === 0) {
+      options.logger.debug(`Package-version id scan reached empty page ${page} for ${owner}/${packageName}`);
       break;
     }
 
     for (const item of items) {
       if (requestedVersionIdSet.has(item.id)) {
         matches.add(item.id);
+        options.logger.debug(`Matched version ${item.id} on page ${page} for ${owner}/${packageName}`);
       }
     }
 
     if (matches.size === requestedVersionIds.length || items.length < 100) {
+      options.logger.debug(
+        `Stopping package-version id scan for ${owner}/${packageName} at page ${page}; matches=${matches.size}/${requestedVersionIds.length}, items=${items.length}`
+      );
       break;
     }
   }

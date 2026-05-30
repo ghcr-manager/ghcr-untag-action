@@ -19,6 +19,7 @@ export async function runUntag(
 
   const registryToken = await loadRegistryPushToken(owner, packageName, options);
   const roots = await resolveSourceTagRoots(owner, packageName, uniqueRequestedTags, registryToken, options);
+  options.logger.debug(`Resolved ${roots.length} source root(s) for ${uniqueRequestedTags.length} requested tag(s)`);
   const operations: UntagOperation[] = [];
   const runtime = options.fetchImpl ? { fetchImpl: options.fetchImpl } : undefined;
 
@@ -44,6 +45,9 @@ export async function runUntag(
       await deletePackageVersion(owner, packageName, detachedVersion.sourceVersionId, options);
       await assertTagRemoved(owner, packageName, tag, options);
       await assertVersionRemoved(owner, packageName, detachedVersion.sourceVersionId, options);
+      options.logger.debug(
+        `Completed untag for ${owner}/${packageName}:${tag}; detached version ${detachedVersion.sourceVersionId} (${detachedDigest}) removed`
+      );
 
       operations.push({
         tag,
@@ -83,6 +87,9 @@ export async function resolveSourceTagRoots(
     const existing = groups.get(manifest.digest);
     if (existing) {
       existing.tags.push(tag);
+      options.logger.debug(
+        `Grouped tag ${owner}/${packageName}:${tag} under existing source digest ${manifest.digest}`
+      );
       continue;
     }
 
@@ -91,6 +98,7 @@ export async function resolveSourceTagRoots(
       tags: [tag],
       manifest
     });
+    options.logger.debug(`Resolved tag ${owner}/${packageName}:${tag} to source digest ${manifest.digest}`);
   }
 
   if (missingTags.length > 0) {

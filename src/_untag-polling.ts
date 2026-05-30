@@ -10,9 +10,15 @@ export async function resolveDetachedTagVersion(
   options: UntagOptions
 ): Promise<TagSource> {
   for (let attempt = 1; attempt <= 5; attempt += 1) {
+    options.logger.debug(
+      `Resolving detached package version for ${owner}/${packageName}:${tag} on attempt ${attempt}/5; expecting ${detachedDigest}`
+    );
     const matches = await listPackageVersionTagSources(owner, packageName, [tag], options);
     const match = matches[0];
     if (match && match.sourceDigest !== sourceRoot.digest && match.sourceDigest === detachedDigest) {
+      options.logger.debug(
+        `Resolved detached package version for ${owner}/${packageName}:${tag} as version ${match.sourceVersionId} (${match.sourceDigest})`
+      );
       return match;
     }
 
@@ -34,8 +40,10 @@ export async function assertTagRemoved(
   options: UntagOptions
 ): Promise<void> {
   for (let attempt = 1; attempt <= 5; attempt += 1) {
+    options.logger.debug(`Checking tag removal for ${owner}/${packageName}:${tag} on attempt ${attempt}/5`);
     const remaining = await listPackageVersionTagSources(owner, packageName, [tag], options);
     if (remaining.length === 0) {
+      options.logger.debug(`Confirmed tag removal for ${owner}/${packageName}:${tag}`);
       return;
     }
 
@@ -57,8 +65,10 @@ export async function assertVersionRemoved(
   options: UntagOptions
 ): Promise<void> {
   for (let attempt = 1; attempt <= 5; attempt += 1) {
+    options.logger.debug(`Checking version removal for ${owner}/${packageName}#${versionId} on attempt ${attempt}/5`);
     const presentVersionIds = await listPresentPackageVersionIds(owner, packageName, [versionId], options);
     if (presentVersionIds.length === 0) {
+      options.logger.debug(`Confirmed package version removal for ${owner}/${packageName}#${versionId}`);
       return;
     }
 

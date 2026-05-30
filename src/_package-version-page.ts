@@ -19,6 +19,7 @@ export async function loadPackageVersionPage(
   url.searchParams.set("per_page", "100");
   url.searchParams.set("page", String(page));
   const requestLabel = `GitHub Packages request for page ${page} (${url.toString()})`;
+  logger.debug(`Loading package-version page ${page} for ${owner}/${packageName}`);
 
   let response;
   try {
@@ -46,5 +47,7 @@ export async function loadPackageVersionPage(
     throw new Error(await buildHttpErrorMessage(response, `${requestLabel} failed`));
   }
 
-  return (await response.json()) as PackageVersionPageItem[];
+  const items = (await response.json()) as PackageVersionPageItem[];
+  logger.debug(`Loaded package-version page ${page} for ${owner}/${packageName} with ${items.length} item(s)`);
+  return items;
 }

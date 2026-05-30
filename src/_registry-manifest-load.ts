@@ -25,6 +25,7 @@ export async function loadRegistryManifestByDigest(
   logger: Logger,
   options?: Pick<UntagOptions, "fetchImpl">
 ): Promise<LoadedRegistryManifest> {
+  logger.debug(`Loading GHCR manifest by digest for ${owner}/${packageName}@${digest}`);
   const document = await _loadRegistryManifestDocument(owner, packageName, digest, registryToken, logger, options);
   return {
     digest,
@@ -41,6 +42,7 @@ export async function loadRegistryManifestByTag(
   logger: Logger,
   options?: Pick<UntagOptions, "fetchImpl">
 ): Promise<LoadedRegistryManifest> {
+  logger.debug(`Loading GHCR manifest by tag for ${owner}/${packageName}:${tag}`);
   const document = await _loadRegistryManifestDocument(owner, packageName, tag, registryToken, logger, options);
   const digest = document.response.headers.get("docker-content-digest");
   if (!digest) {
@@ -64,6 +66,7 @@ async function _loadRegistryManifestDocument(
 ): Promise<{ mediaType: string; rawJson: string; response: ResponseLike }> {
   const fetchImpl = resolveFetch(options?.fetchImpl);
   const url = new URL(`/v2/${owner}/${packageName}/manifests/${reference}`, ghcrRegistryBaseUrl);
+  logger.debug(`Fetching GHCR manifest ${url.toString()}`);
 
   let response;
   try {
@@ -95,6 +98,8 @@ async function _loadRegistryManifestDocument(
   if (!mediaType) {
     throw new Error(`manifest response for ${reference} did not include a media type`);
   }
+
+  logger.debug(`Loaded GHCR manifest ${reference} for ${owner}/${packageName} with media type ${mediaType}`);
 
   return {
     mediaType,

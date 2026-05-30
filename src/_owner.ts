@@ -12,10 +12,12 @@ export async function getOwnerUriComponent(
 ): Promise<string> {
   const cached = _ownerUriComponentByOwner.get(owner);
   if (cached) {
+    logger.debug(`Using cached owner URI component for ${owner}: ${cached}`);
     return cached;
   }
 
   const url = new URL(`/users/${encodeURIComponent(owner)}`, githubApiBaseUrl).toString();
+  logger.debug(`Resolving GitHub owner type for ${owner} via ${url}`);
   for (let attempt = 1; ; attempt += 1) {
     const response = await fetchImpl(url, {
       headers: {
@@ -30,11 +32,13 @@ export async function getOwnerUriComponent(
       if (payload.type === "Organization") {
         const value = `orgs/${encodeURIComponent(owner)}`;
         _ownerUriComponentByOwner.set(owner, value);
+        logger.debug(`Resolved GitHub owner ${owner} as organization`);
         return value;
       }
       if (payload.type === "User") {
         const value = `users/${encodeURIComponent(owner)}`;
         _ownerUriComponentByOwner.set(owner, value);
+        logger.debug(`Resolved GitHub owner ${owner} as user`);
         return value;
       }
       throw new Error("GitHub owner lookup did not include a supported type");

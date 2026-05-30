@@ -18,6 +18,7 @@ export async function loadRegistryPushToken(
   const tokenUrl = new URL("/token", registryUrl);
   tokenUrl.searchParams.set("service", registryUrl.host);
   tokenUrl.searchParams.set("scope", `repository:${owner}/${packageName}:pull,push`);
+  options.logger.debug(`Requesting GHCR push token for ${owner}/${packageName}`);
 
   let response;
   try {
@@ -46,5 +47,6 @@ export async function loadRegistryPushToken(
     throw new Error("GHCR token response did not include a token");
   }
 
+  options.logger.debug(`Received GHCR push token for ${owner}/${packageName}`);
   return body.token;
 }

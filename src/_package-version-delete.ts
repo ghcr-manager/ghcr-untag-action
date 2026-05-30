@@ -21,6 +21,7 @@ export async function deletePackageVersion(
     `/${ownerUriComponent}/packages/container/${encodeURIComponent(packageName)}/versions/${versionId}`,
     githubApiBaseUrl
   ).toString();
+  options.logger.debug(`Deleting package version ${owner}/${packageName}#${versionId}`);
 
   let response;
   try {
@@ -59,4 +60,6 @@ export async function deletePackageVersion(
       await buildHttpErrorMessage(response, `GitHub package delete request failed for version ${versionId}`)
     );
   }
+
+  options.logger.debug(`Deleted package version ${owner}/${packageName}#${versionId}`);
 }
