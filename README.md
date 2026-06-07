@@ -5,7 +5,7 @@
 [![Immutable Releases](https://img.shields.io/badge/releases-immutable-blue?labelColor=333)](https://docs.github.com/en/code-security/supply-chain-security/understanding-your-software-supply-chain/immutable-releases)
 [![Tests](https://img.shields.io/github/actions/workflow/status/ghcr-manager/ghcr-untag-action/.github/workflows/ci_unit-test-lint.yml?branch=main&label=test&style=flat-square)](https://github.com/ghcr-manager/ghcr-untag-action/actions/workflows/ci_unit-test-lint.yml)
 
-Remove one or more tags from a GHCR container package while keeping everything else in place.
+Remove one or more tags from a GHCR container package while keeping everything else in place - including timestamps.
 
 GitHub Container Registry does not offer a direct "remove this tag only" operation. This action automates a workaround
 for you.
