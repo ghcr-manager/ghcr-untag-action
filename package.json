@@ -25,18 +25,18 @@
     "@actions/core": "^3.0.1"
   },
   "devDependencies": {
-    "@vercel/ncc": "^0.44.0",
+    "@vercel/ncc": "^0.44.1",
     "@eslint/js": "^10.0.1",
     "@types/node": "^24.13.2",
     "c8": "^11.0.0",
-    "eslint": "^10.5.0",
+    "eslint": "^10.6.0",
     "eslint-plugin-yml": "^3.5.0",
     "globals": "^17.7.0",
-    "markdownlint-cli2": "^0.22.1",
-    "prettier": "^3.8.4",
+    "markdownlint-cli2": "^0.23.0",
+    "prettier": "^3.9.4",
     "tsx": "^4.22.4",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.62.0",
+    "typescript-eslint": "^8.62.1",
     "yaml": "^2.9.0"
   }
 }
