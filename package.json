@@ -25,9 +25,9 @@
     "@actions/core": "^3.0.1"
   },
   "devDependencies": {
-    "@vercel/ncc": "^0.44.1",
     "@eslint/js": "^10.0.1",
     "@types/node": "^24.13.3",
+    "@vercel/ncc": "^0.44.1",
     "c8": "^11.0.0",
     "eslint": "^10.6.0",
     "eslint-plugin-yml": "^3.6.0",
@@ -35,7 +35,7 @@
     "markdownlint-cli2": "^0.23.0",
     "prettier": "^3.9.4",
     "tsx": "^4.23.0",
-    "typescript": "^7.0.2",
+    "typescript": "^6.0.3",
     "typescript-eslint": "^8.63.0",
     "yaml": "^2.9.0"
   }
