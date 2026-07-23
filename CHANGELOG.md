@@ -7,6 +7,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [v1.0.7] - 2026-07-23
+
+### Changed
+
+- Bump the npm build and development toolchain dependencies, including `@vercel/ncc`, `@types/node`, `eslint`,
+  `eslint-plugin-yml`, `globals`, `markdownlint-cli2`, `prettier`, `tsx`, and `typescript-eslint`.
+- Keep `typescript` pinned to `6.0.3` until the ESLint toolchain supports TypeScript 7.
+
 ## [v1.0.6] - 2026-06-14
 
 ### Changed
