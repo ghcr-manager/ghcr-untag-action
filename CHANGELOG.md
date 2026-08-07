@@ -7,6 +7,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [v1.0.9] - 2026-08-07
+
+### Added
+
+- Add a dedicated MegaLinter CI workflow for repository linting and security checks.
+
+### Changed
+
+- Harden GitHub Actions workflow permissions and secret handling for the live test and release jobs.
+- Run workflow linting against a built action bundle while excluding generated `dist/` files from source linters.
+
 ## [v1.0.8] - 2026-08-07
 
 ### Changed
