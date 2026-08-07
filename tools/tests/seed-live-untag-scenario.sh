@@ -12,7 +12,7 @@ work_dir="$(mktemp -d)"
 trap 'rm -rf "$work_dir"' EXIT
 
 cp "$fixture_dir/Dockerfile" "$work_dir/Dockerfile"
-printf '%s\n' "$scenario" > "$work_dir/payload.txt"
+printf '%s\n' "$scenario" >"$work_dir/payload.txt"
 
 case "$scenario" in
   image-manifest-multiple-tags)
@@ -25,14 +25,14 @@ case "$scenario" in
       "$work_dir"
     ;;
   image-manifest-single-tag)
-    printf '%s\n' "$scenario-keep" > "$work_dir/payload.txt"
+    printf '%s\n' "$scenario-keep" >"$work_dir/payload.txt"
     docker buildx build \
       --platform linux/amd64 \
       --provenance=false \
       --push \
       --tag "$image_ref:$keep_tag" \
       "$work_dir"
-    printf '%s\n' "$scenario-delete" > "$work_dir/payload.txt"
+    printf '%s\n' "$scenario-delete" >"$work_dir/payload.txt"
     docker buildx build \
       --platform linux/amd64 \
       --provenance=false \
@@ -56,7 +56,7 @@ case "$scenario" in
   single-platform-index-single-tag)
     keep_seed_tag="seed-platform-keep"
     delete_seed_tag="seed-platform-delete"
-    printf '%s\n' "$scenario-keep" > "$work_dir/payload.txt"
+    printf '%s\n' "$scenario-keep" >"$work_dir/payload.txt"
     docker buildx build \
       --platform linux/amd64 \
       --provenance=false \
@@ -66,7 +66,7 @@ case "$scenario" in
     docker buildx imagetools create \
       --tag "$image_ref:$keep_tag" \
       "$image_ref:$keep_seed_tag"
-    printf '%s\n' "$scenario-delete" > "$work_dir/payload.txt"
+    printf '%s\n' "$scenario-delete" >"$work_dir/payload.txt"
     docker buildx build \
       --platform linux/amd64 \
       --provenance=false \
@@ -85,7 +85,7 @@ case "$scenario" in
         --artifact-type application/vnd.ghcr-manager.live-untag-test.v1 \
         --format json \
         "$image_ref:$keep_tag" \
-        "payload.txt:text/plain" > "$artifact_output"
+        "payload.txt:text/plain" >"$artifact_output"
     )
     artifact_digest="$(jq -r '.digest' "$artifact_output")"
     [[ -n "$artifact_digest" && "$artifact_digest" != "null" ]] || {
@@ -95,7 +95,7 @@ case "$scenario" in
     oras tag "$image_ref@$artifact_digest" "$delete_tag"
     ;;
   artifact-manifest-single-tag)
-    printf '%s\n' "$scenario-keep" > "$work_dir/keep.txt"
+    printf '%s\n' "$scenario-keep" >"$work_dir/keep.txt"
     (
       cd "$work_dir"
       oras push \
@@ -103,7 +103,7 @@ case "$scenario" in
         "$image_ref:$keep_tag" \
         "keep.txt:text/plain"
     )
-    printf '%s\n' "$scenario-delete" > "$work_dir/delete.txt"
+    printf '%s\n' "$scenario-delete" >"$work_dir/delete.txt"
     (
       cd "$work_dir"
       oras push \
