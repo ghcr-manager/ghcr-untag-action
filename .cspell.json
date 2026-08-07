@@ -1,0 +1,26 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "ignorePaths": ["**/.git/**"],
+  "words": [
+    "DEVSKIM",
+    "HEALTHCHECK",
+    "ORAS",
+    "SHFMT",
+    "ZIZMOR",
+    "buildx",
+    "cooldown",
+    "ignorefile",
+    "imagetools",
+    "joshjohanning",
+    "lycheeignore",
+    "oras",
+    "pipefail",
+    "retargets",
+    "shfmt",
+    "tcort",
+    "untagging",
+    "wuodan",
+    "zizmor"
+  ]
+}

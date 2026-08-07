@@ -1,0 +1,12 @@
+title = "ghcr-untag-action gitleaks config"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+targetRules = ["generic-api-key"]
+description = "Ignore example apiToken string embedded in bundled dist docs."
+condition = "AND"
+paths = ['''^dist/index\.js$''']
+regexTarget = "line"
+regexes = ['''const apiToken = "abc123xyz456";''']
