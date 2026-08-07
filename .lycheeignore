@@ -1,0 +1,2 @@
+# Ignore templated shell-style URLs like ${ORAS_VERSION} in workflow scripts.
+\$\{
