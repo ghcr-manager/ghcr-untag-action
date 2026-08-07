@@ -30,16 +30,22 @@ run-name: Test Live Untag Executor (${{ inputs.scenario }})
         required: false
         default: ""
         type: string
+    secrets:
+      GH_TEST_PAT:
+        required: true
 
 permissions:
   contents: read
-  packages: write
 
 jobs:
   setup:
     name: Setup ${{ inputs.owner }}/${{ inputs.scenario }}
     uses: ./.github/workflows/test_setup-live-untag-scenario.yml
-    secrets: inherit
+    permissions:
+      contents: read
+      packages: write
+    secrets:
+      GH_TEST_PAT: ${{ secrets.GH_TEST_PAT }}
     with:
       owner: ${{ inputs.owner }}
       scenario: ${{ inputs.scenario }}
@@ -48,11 +54,16 @@ jobs:
     name: Test ${{ inputs.owner }}/${{ inputs.scenario }}
     needs: setup
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     concurrency:
       group: untag-action__live__${{ inputs.owner }}__${{ inputs.scenario }}
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Set up Node.js
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0

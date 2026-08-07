@@ -46,15 +46,20 @@ run-name: Test Setup Live Untag Scenario (${{ inputs.scenario }})
       delete_tags:
         description: Newline-separated tags to remove.
         value: ${{ jobs.setup.outputs.delete_tags }}
+    secrets:
+      GH_TEST_PAT:
+        required: true
 
 permissions:
   contents: read
-  packages: write
 
 jobs:
   setup:
     name: Setup ${{ inputs.owner }}/${{ inputs.scenario }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     outputs:
       owner: ${{ steps.resolve.outputs.owner }}
       package_name: ${{ steps.resolve.outputs.package_name }}
@@ -64,6 +69,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Require test owner configuration
         shell: bash

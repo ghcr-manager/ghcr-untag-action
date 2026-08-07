@@ -4,10 +4,12 @@ run-name: Test Live Untag All Matrix
 "on":
   workflow_dispatch:
   workflow_call:
+    secrets:
+      GH_TEST_PAT:
+        required: true
 
 permissions:
   contents: read
-  packages: write
 
 jobs:
   prepare:
@@ -18,6 +20,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Require test owner configuration
         shell: bash
@@ -42,11 +46,15 @@ jobs:
   execute:
     name: Execute tests in JSON matrix
     needs: prepare
+    permissions:
+      contents: read
+      packages: write
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.prepare.outputs.matrix) }}
     uses: ./.github/workflows/test_live-untag.yml
-    secrets: inherit
+    secrets:
+      GH_TEST_PAT: ${{ secrets.GH_TEST_PAT }}
     with:
       owner: ${{ matrix.owner }}
       scenario: ${{ matrix.scenario }}
