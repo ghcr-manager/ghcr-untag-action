@@ -84,6 +84,10 @@ jobs:
         run: |
           npm ci --ignore-scripts
 
+      - name: Build action bundle
+        run: |
+          npm run build
+
       - name: MegaLinter
         id: ml
         continue-on-error: true
@@ -116,7 +120,8 @@ jobs:
         if: >-
           always() && steps.ml.outputs.has_updated_sources == 1 && env.FIX_MODE == 'pull_request'
         with:
-          token: ${{ secrets.PAT || github.token }}
+          token: ${{ github.token }}
+          sign-commits: true
           commit-message: "[MegaLinter] Apply linters automatic fixes"
           title: "[MegaLinter] Apply linters automatic fixes"
           body-path: ${{ runner.temp }}/megalinter-reports/megalinter-report.md
