@@ -7,6 +7,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [v1.0.8] - 2026-08-07
+
+### Changed
+
+- Bump the npm build and development toolchain dependencies, including `c8`, `eslint`, `globals`, `js-yaml`,
+  `markdownlint-cli2`, `prettier`, `typescript-eslint`, and `undici`.
+- Refresh pinned GitHub Actions workflow dependencies, including `actions/checkout`, `docker/login-action`, and
+  `tcort/github-action-markdown-link-check`.
+- Refresh transitive npm packages in `package-lock.json` to address dependency vulnerabilities.
+
 ## [v1.0.7] - 2026-07-23
 
 ### Changed
