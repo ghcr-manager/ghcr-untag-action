@@ -1,2 +1,3 @@
-# Ignore templated shell-style URLs like ${ORAS_VERSION} in workflow scripts.
-\$\{
+# Ignore templated shell-style URLs like ${ORAS_VERSION} in workflow scripts,
+# including lychee's percent-encoded `{` form (`$%7B...%7D`).
+\$(\{|%7B)
