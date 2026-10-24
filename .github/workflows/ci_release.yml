@@ -119,10 +119,12 @@ jobs:
           FULL_TAG: ${{ needs.verify-tag.outputs.full_tag }}
           MAJOR_TAG: ${{ needs.verify-tag.outputs.major_tag }}
           MINOR_TAG: ${{ needs.verify-tag.outputs.minor_tag }}
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          git push origin "refs/tags/$FULL_TAG"
-          git push --force origin "refs/tags/$MAJOR_TAG" "refs/tags/$MINOR_TAG"
+          remote="https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push "$remote" "refs/tags/$FULL_TAG"
+          git push --force "$remote" "refs/tags/$MAJOR_TAG" "refs/tags/$MINOR_TAG"
 
       - name: Create GitHub release
         env:
