@@ -7,7 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
-## [v1.0.9] - 2026-08-07
+## [v1.0.9] - 2026-10-24
 
 ### Added
 
@@ -17,6 +17,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - Harden GitHub Actions workflow permissions and secret handling for the live test and release jobs.
 - Run workflow linting against a built action bundle while excluding generated `dist/` files from source linters.
+- Refresh the npm build, type-checking, testing, linting, and formatting toolchain dependencies.
+- Refresh pinned GitHub Actions dependencies used by CI, live tests, and release automation.
+- Update dependency lockfile security fixes and repository dependency-management configuration.
 
 ## [v1.0.8] - 2026-08-07
 
