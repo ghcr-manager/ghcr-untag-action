@@ -24,7 +24,7 @@ REPOSITORY_KINGFISHER_ARGUMENTS: "--exclude node_modules"
 BASH_SHFMT_ARGUMENTS: "--indent 2 -case-indent"
 
 # trivy
-REPOSITORY_TRIVY_ARGUMENTS: "--ignorefile ./.trivyignore.yaml"
+REPOSITORY_TRIVY_ARGUMENTS: "--ignorefile .github/linters/.trivyignore.yaml"
 
 # zizmor
 ACTION_ZIZMOR_UNSECURED_ENV_VARIABLES:

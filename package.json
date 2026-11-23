@@ -9,14 +9,14 @@
   },
   "scripts": {
     "build": "rm -rf dist .bundle-tmp && tsc --project tsconfig.json --outDir .bundle-tmp && ncc build .bundle-tmp/index.js -o dist --license licenses.txt && rm -rf .bundle-tmp",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
+    "format": "prettier --write . --config .github/linters/.prettierrc.json --ignore-path .github/linters/.prettierignore",
+    "format:check": "prettier --check . --ignore-path .github/linters/.prettierignore",
     "lint": "npm run check:file-names && npm run check:test-mapping && npm run typecheck && npm run lint:ts && npm run lint:yaml && npm run lint:markdown && npm run format:check",
     "check:file-names": "node tools/tests/check-src-file-names.mjs",
     "check:test-mapping": "node tools/tests/check-test-mapping.mjs",
     "lint:ts": "eslint \"src/**/*.ts\" \"tests/**/*.ts\"",
     "lint:yaml": "eslint \".github/**/*.yml\" \"*.yml\"",
-    "lint:markdown": "markdownlint-cli2",
+    "lint:markdown": "markdownlint-cli2 --config .github/linters/.markdownlint-cli2.jsonc",
     "typecheck": "tsc --noEmit --project tsconfig.test.json",
     "test": "node --import tsx --test",
     "coverage": "c8 --src src --reporter=text --reporter=text-summary node --import tsx --test"
