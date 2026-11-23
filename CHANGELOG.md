@@ -7,6 +7,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [v1.0.10] - 2026-11-23
+
+### Added
+
+- Added a "Required Status Checks" CI job for the repository ruleset.
+
+### Changed
+
+- Consolidated linter configuration under `.github/linters/` and fixed affected paths.
+- Updated npm dependencies and GitHub Actions.
+- Ignore `https://x-access-token`-style URLs in Lychee link checking.
+- Run release, CI, and live-test workflows on Node.js 26.
+
+### Fixed
+
+- Override dev-only transitive dependencies `glob`, `katex`, and `minimatch` with versions that clear known npm audit
+  advisories.
+
 ## [v1.0.9] - 2026-10-24
 
 ### Added
